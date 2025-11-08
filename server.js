@@ -1,15 +1,15 @@
-
 const express = require('express');
 const cors = require('cors');
 const axios = require('axios');
 const path = require('path');
+const fs = require('fs');
 
 const app = express();
 app.use(cors());
 app.use(express.json());
 
-// Serve static files from current directory
-app.use(express.static(path.join(__dirname)));
+// Serve static files from public folder
+app.use(express.static(path.join(__dirname, 'public')));
 
 // API endpoint for YandexGPT
 app.post('/api/enhance', async (req, res) => {
@@ -43,8 +43,8 @@ app.post('/api/enhance', async (req, res) => {
       {
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': 'Api-Key ${process.env.YANDEX_API_KEY}',
-          'x-folder-id': 'process.env.YANDEX_FOLDER_ID',
+          'Authorization': `Api-Key ${process.env.YANDEX_API_KEY}`,
+          'x-folder-id': process.env.YANDEX_FOLDER_ID,
         },
       }
     );
@@ -62,33 +62,16 @@ app.post('/api/enhance', async (req, res) => {
   }
 });
 
-// Serve HTML files
-app.get('/', (req, res) => {
-  // Try different HTML file names
-  const htmlFiles = ['/index.html'];
-
-// Все неизвестные маршруты тоже в index.html
-app.get('*', (req, res) => {
-  res.sendFile(__dirname + '/index.html');
-});
-
-  for (const file of htmlFiles) {
-    try {
-      const filePath = path.join(__dirname, file);
-      const fs = require('fs');
-      if (fs.existsSync(filePath)) {
-        return res.sendFile(filePath);
-      }
-    } catch (e) {
-      // Continue to next file
-    }
+// Fallback: serve index.html from public folder
+app.use((req, res) => {
+  const filePath = path.join(__dirname, 'public', 'index.html');
+  if (fs.existsSync(filePath)) {
+    return res.sendFile(filePath);
   }
-
-  // If no HTML file found
-  res.send('HTML file not found. Please rename one of your HTML files to index.html');
+  res.status(404).send('index.html not found');
 });
 
-const PORT = 3001;
+const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {
   console.log(`✅ Server running on http://localhost:${PORT}`);
   console.log(`📂 Current directory: ${__dirname}`);
