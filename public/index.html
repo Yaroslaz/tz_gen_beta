@@ -1077,9 +1077,9 @@
         async function callYandexGPT(prompt) {
             try {
                 // Get API URL from environment or use default
-                const apiUrl = window.API_URL || 'http://localhost:3001';
+                const apiUrl = window.API_URL || '/api/enhance';
 
-                const response = await fetch('http://localhost:3001/api/enhance', {
+                const response = await fetch('/api/enhance', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ prompt })
