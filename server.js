@@ -65,7 +65,12 @@ app.post('/api/enhance', async (req, res) => {
 // Serve HTML files
 app.get('/', (req, res) => {
   // Try different HTML file names
-  const htmlFiles = ['index.html', 'index_fixed.html', 'index_working.html', 'index_with_server.html'];
+  const htmlFiles = ['/index.html'];
+
+// Все неизвестные маршруты тоже в index.html
+app.get('*', (req, res) => {
+  res.sendFile(__dirname + '/index.html');
+});
 
   for (const file of htmlFiles) {
     try {
